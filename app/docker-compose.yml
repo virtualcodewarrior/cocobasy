@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+    deno:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        working_dir: /app
+        container_name: deno_dev
+        volumes:
+            - .:/app
+        ports:
+            - '5080:8080'
