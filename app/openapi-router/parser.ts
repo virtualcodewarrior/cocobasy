@@ -5,7 +5,7 @@ import {
     PathItemObject,
     ROUTER_VERB,
     SchemaObject
-} from "./openapi-document.ts";
+} from './openapi-document.ts';
 import {ERROR_CODE, ErrorObject, MiddleWareRequest, RouteInfo, VerbInfo} from "../middle-ware/types.ts";
 
 enum DATA_LOCATION {

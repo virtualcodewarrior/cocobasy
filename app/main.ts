@@ -24,10 +24,26 @@ const openAPI: OpenApiDocument = {
                 tags: ['/test'],
                 description: '',
                 parameters: [],
-                responses: {}
+                responses: {},
+            }
+        },
+        '/test/authentication': {
+            'x-swagger-router-controller': 'middleware-name1',
+            get: {
+                operationId: 'swagTest',
+                tags: ['/test'],
+                description: '',
+                parameters: [],
+                responses: {},
+                security: [{}],
             }
         }
     }
 };
 
-setUpRoutes(middleWare, openAPI, true);
+setUpRoutes(middleWare, openAPI, true, (_req, _res) => {
+    const isAuthenticated = true;
+    if (!isAuthenticated) {
+        throw Error('Unauthenticated');
+    }
+});
