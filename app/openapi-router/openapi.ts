@@ -1,17 +1,25 @@
 import {parser} from "./parser.ts";
 import {OpenApiDocument} from "./openapi-document.ts";
 import {MiddleWare} from "../middle-ware/middle-ware.ts";
-import {MiddlewareFunction, MiddleWareRequest, MiddleWareResponse, RouteInfo} from "../middle-ware/types.ts";
+import {
+    MiddlewareAuthenticationFunction,
+    MiddleWareRequest,
+    MiddleWareResponse,
+    RouteInfo
+} from "../middle-ware/types.ts";
 
-const attachToRouter = (middleware: MiddleWare, route: RouteInfo, validate: boolean, authenticate?: MiddlewareFunction) => {
+const attachToRouter = (middleware: MiddleWare, route: RouteInfo, validate: boolean, authenticate?: MiddlewareAuthenticationFunction) => {
     const resource = route.path;
     const handler = route.controller && route.middlewareFunction ? middleware.getHandler(route.controller, route.middlewareFunction) : undefined;
     if (handler) {
-        console.log(`SETTING UP ROUTE ${resource} ${route.verb} ${route.controller}.${route.middlewareFunction}`);
         const handlers = [handler];
         // authenticate if so required
-        if (authenticate && typeof authenticate === "function" && route.mustAuthenticate) {
-            handlers.unshift(authenticate);
+        if (authenticate && typeof authenticate === "function") {
+            handlers.unshift((req, res) => {
+                if (route.authenticate) {
+                    authenticate(req, res, route.authenticate);
+                }
+            });
         }
         // validate first in case authentication depends on your request input
         if (validate) {
@@ -25,8 +33,9 @@ const attachToRouter = (middleware: MiddleWare, route: RouteInfo, validate: bool
     }
 };
 
-export function setUpRoutes(middleware: MiddleWare, openApiDoc: OpenApiDocument, validate: boolean, authenticate?: MiddlewareFunction) {
+export function setUpRoutes(middleware: MiddleWare, openApiDoc: OpenApiDocument, validate: boolean, authenticate?: MiddlewareAuthenticationFunction) {
     parser(openApiDoc, validate).forEach((route) => {
         ((!/\\/.test(route.path)) ? attachToRouter(middleware, route, validate, authenticate) : console.log("SWAGGER doc contains invalid routes, no routes have been set-up"));
     });
+    middleware.logRoutes();
 }

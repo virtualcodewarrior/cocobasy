@@ -1,12 +1,14 @@
 import {serve} from './deps.ts';
 import {setUpRoutes} from "./openapi-router/openapi.ts";
 import {OpenApiDocument} from "./openapi-router/openapi-document.ts";
-import {ensureMiddleware} from "./middle-ware/middle-ware.ts";
+import {ensureMiddleware, MiddlewareError} from "./middle-ware/middle-ware.ts";
 import {registerHandlers} from "./services/swagtest.ts";
+import {registerHandlers as registerWebHandlers} from "./services/serv-web.ts";
 
 
 const middleWare = ensureMiddleware();
 registerHandlers(middleWare);
+registerWebHandlers(middleWare);
 const port = parseInt(Deno.env.get('PORT') ?? '8080', 10);
 serve(middleWare.handleRequest.bind(middleWare), {port});
 
@@ -17,7 +19,7 @@ const openAPI: OpenApiDocument = {
         version: '1.0.0',
     },
     paths: {
-        '/test/{num}': {
+        '/api/v1/{num}': {
             'x-swagger-router-controller': 'middleware-name1',
             get: {
                 operationId: 'swagTest',
@@ -27,7 +29,7 @@ const openAPI: OpenApiDocument = {
                 responses: {},
             }
         },
-        '/test/authentication': {
+        '/api/v1/authentication': {
             'x-swagger-router-controller': 'middleware-name1',
             get: {
                 operationId: 'swagTest',
@@ -37,13 +39,32 @@ const openAPI: OpenApiDocument = {
                 responses: {},
                 security: [{}],
             }
+        },
+        '/*': {
+            'x-swagger-router-controller': 'webapp',
+            get: {
+                operationId: 'serveWeb',
+                tags: [''],
+                description: '',
+                parameters: [],
+                responses: {},
+            }
+        }
+    },
+    components: {
+        securitySchemes: {
+            basic: {
+                type: 'apiKey',
+                name: 'auth-key',
+                in: 'cookie',
+            }
         }
     }
 };
 
-setUpRoutes(middleWare, openAPI, true, (_req, _res) => {
-    const isAuthenticated = true;
+setUpRoutes(middleWare, openAPI, true, (_req, _res, _authenticate) => {
+    const isAuthenticated = false;
     if (!isAuthenticated) {
-        throw Error('Unauthenticated');
+        throw new MiddlewareError(401, 'Unauthenticated');
     }
 });

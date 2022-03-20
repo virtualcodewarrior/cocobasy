@@ -202,16 +202,43 @@ export interface OAuthFlowsObject {
     authorizationCode?: OAuthFlowObject;
 }
 
-export interface SecuritySchemeObject {
+export interface SecuritySchemeObjectBase {
     type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
     description?: string;
-    name: string;
-    in: 'query' | 'header' | 'cookie';
+    name?: string;
+    in?: 'query' | 'header' | 'cookie';
     scheme?: string;
     bearerFormat?: string;
     flows?: OAuthFlowsObject;
     openIdConnectUrl?: string;
 }
+
+export interface SecuritySchemeObjectApiKey extends SecuritySchemeObjectBase {
+    type: 'apiKey';
+    name: string;
+    in: 'query' | 'header' | 'cookie';
+}
+
+export interface SecuritySchemeObjectHttp extends SecuritySchemeObjectBase {
+    type: 'http';
+    bearerFormat?: string;
+}
+
+export interface SecuritySchemeObjectOAuth2 extends SecuritySchemeObjectBase {
+    type: 'oauth2';
+    flows: OAuthFlowsObject;
+}
+
+export interface SecuritySchemeObjectOpenIdConnect extends SecuritySchemeObjectBase {
+    type: 'openIdConnect';
+    openIdConnectUrl: string;
+}
+
+type SecuritySchemeObject =
+    SecuritySchemeObjectApiKey
+    | SecuritySchemeObjectHttp
+    | SecuritySchemeObjectOAuth2
+    | SecuritySchemeObjectOpenIdConnect;
 
 export interface LinkObject {
     operationRef?: string;

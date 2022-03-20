@@ -1,4 +1,4 @@
-import {OperationObject, ROUTER_VERB} from "../openapi-router/openapi-document.ts";
+import {OperationObject, ROUTER_VERB, SecurityRequirementObject} from "../openapi-router/openapi-document.ts";
 
 export enum ERROR_CODE {
     REQUEST_ERROR_REQUIRED_ITEM_MISSING = 'REQUEST_ERROR_REQUIRED_ITEM_MISSING',
@@ -17,7 +17,7 @@ export interface VerbInfo {
 export interface RouteInfo extends VerbInfo {
     path: string;
     validator?: (validate: boolean | MiddlewareFunction, req: MiddleWareRequest, res: MiddleWareResponse) => Promise<void>;
-    mustAuthenticate?: boolean;
+    authenticate?: SecurityRequirementObject[];
 }
 
 export interface ErrorObject {
@@ -31,6 +31,7 @@ export interface MiddleWareResponse {
         validateErrors: ErrorObject[];
     };
     body?: Blob | BufferSource | FormData | ReadableStream | URLSearchParams | string;
+    headers: Headers;
 }
 
 export interface MiddleWareRequest {
@@ -46,3 +47,4 @@ export interface MiddleWareRequest {
 }
 
 export type MiddlewareFunction = (req: MiddleWareRequest, res: MiddleWareResponse) => Promise<void> | void;
+export type MiddlewareAuthenticationFunction = (req: MiddleWareRequest, res: MiddleWareResponse, authenticate: SecurityRequirementObject[]) => Promise<void> | void;

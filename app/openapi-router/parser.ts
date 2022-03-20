@@ -386,7 +386,7 @@ const createValidator = (route: RouteInfo, openApiDoc: OpenApiDocument) => {
         }
     };
     // check if authentication is required, we will just check to see if a security section exists for this route and that it has at least one item
-    route.mustAuthenticate = Boolean(route.operationObject.security && route.operationObject.security.length);
+    route.authenticate = route.operationObject.security;
     // create validators for parameters
     if (route.operationObject.parameters) {
         route.operationObject.parameters.map((parameter) => {

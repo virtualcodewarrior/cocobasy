@@ -1,10 +1,29 @@
 import {ROUTER_VERB} from "../openapi-router/openapi-document.ts";
 import {MiddlewareFunction, MiddleWareRequest, MiddleWareResponse} from "./types.ts";
 import {getCookies} from "https://deno.land/std/http/cookie.ts";
+import {compareUrlPattern} from "../utils/compare-url-pattern.ts";
 
 interface Route {
     handlers: MiddlewareFunction[];
     urlPattern: URLPattern;
+}
+
+export class MiddlewareError extends Error {
+    private _status: number;
+
+    constructor(status: number, error: string) {
+        super(error)
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, MiddlewareError)
+        }
+
+        this.name = 'MiddlewareError';
+        this._status = status;
+    }
+
+    get status() {
+        return this._status
+    }
 }
 
 function methodToRouterVerb(method: string): ROUTER_VERB | undefined {
@@ -39,15 +58,17 @@ export class MiddleWare {
 
     setRoute(verb: ROUTER_VERB, resource: string, handlers: MiddlewareFunction[]) {
         const parts = resource.split('/');
+        const pathname = parts.map((part) => /^{[^}]+}$/.test(part) ? `:${part.slice(1, -1)}` : part).join('/');
         this.routes[verb] = this.routes[verb] ?? [];
         this.routes[verb].push({
             handlers,
-            urlPattern: new URLPattern({pathname: parts.map((part) => /^{[^}]+}$/.test(part) ? `:${part.slice(1, -1)}` : part).join('/')}),
+            urlPattern: new URLPattern({pathname}),
         });
+        this.routes[verb].sort((first, second) => compareUrlPattern(first.urlPattern, second.urlPattern));
     }
 
     async handleRequest(req: Request): Promise<Response> {
-        const middleWareResponse: MiddleWareResponse = {};
+        const middleWareResponse: MiddleWareResponse = {headers: new Headers()};
         const verb = methodToRouterVerb(req.method);
         let response;
         if (verb) {
@@ -73,9 +94,14 @@ export class MiddleWare {
                 await this.doHandle(middleWareRequest, middleWareResponse);
                 response = new Response(middleWareResponse.body, {
                     status: middleWareResponse.status,
+                    headers: middleWareResponse.headers,
                 });
             } catch (err) {
-                response = new Response(`error: ${err}`, {status: 500});
+                if (err instanceof MiddlewareError) {
+                    response = new Response(`error: ${err.message}`, {status: err.status});
+                } else {
+                    response = new Response(`error: ${err}`, {status: 500});
+                }
             }
         } else {
             response = new Response();
@@ -90,6 +116,14 @@ export class MiddleWare {
 
     getHandler(context: string, functionName: string) {
         return this.middlewareObjects[context][functionName];
+    }
+
+    logRoutes() {
+        Object.entries(this.routes).forEach(([key, routes]) => {
+            routes.forEach((route) => {
+                console.log(`SETTING UP '${key.toUpperCase()}' ROUTE ${route.urlPattern.pathname}`);
+            })
+        });
     }
 
     private async doHandle(req: MiddleWareRequest, res: MiddleWareResponse): Promise<void> {
@@ -121,3 +155,5 @@ export function ensureMiddleware() {
     }
     return middleware;
 }
+
+
