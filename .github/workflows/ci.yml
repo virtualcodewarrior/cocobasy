@@ -22,7 +22,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner and deno has been installed"
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
 
-      - name Run linter
+      - name: Run linter
         run: deno lint
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
