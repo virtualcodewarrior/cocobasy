@@ -113,17 +113,17 @@ export interface SchemaObject {
     not?: SchemaObject | ReferenceObject;
     items?: SchemaObject | ReferenceObject;
     properties?: SchemaObject | ReferenceObject;
-    additionalProperties?: boolean | Record<string, any> | SchemaObject | ReferenceObject;
+    additionalProperties?: boolean | Record<string, unknown> | SchemaObject | ReferenceObject;
     description?: string;
     format?: string;
-    default?: any;
+    default?: unknown;
     nullable?: boolean;
     discriminator?: DiscriminatorObject;
     readOnly?: boolean;
     writeOnly?: boolean;
     xml?: XMLObject;
     externalDocs?: ExternalDocumentationObject;
-    example?: any;
+    example?: unknown;
     deprecated?: boolean;
 }
 
@@ -150,7 +150,7 @@ export interface EncodingObject {
 
 export interface MediaTypeObject {
     schema?: SchemaObject | ReferenceObject;
-    example?: any;
+    example?: unknown;
     examples?: Record<string, ExampleObject | ReferenceObject>;
     encoding?: Record<string, EncodingObject>;
 }
@@ -164,7 +164,7 @@ export interface HeaderObject {
     explode?: boolean;
     allowReserved?: boolean;
     schema?: SchemaObject | ReferenceObject;
-    example?: any;
+    example?: unknown;
     examples?: Record<string, ExampleObject | ReferenceObject>;
     content?: Record<string, MediaTypeObject>;
 }
@@ -178,7 +178,7 @@ export interface ParameterObject extends HeaderObject {
 export interface ExampleObject {
     summary?: string;
     description?: string;
-    value?: any;
+    value?: unknown;
     externalValue?: string;
 }
 
@@ -216,8 +216,8 @@ export interface SecuritySchemeObject {
 export interface LinkObject {
     operationRef?: string;
     operationId?: string;
-    parameters?: Record<string, any>;
-    requestBody?: any;
+    parameters?: Record<string, unknown>;
+    requestBody?: unknown;
     description?: string;
     server?: ServerObject;
 }
@@ -250,7 +250,7 @@ export interface ExternalDocumentationObject {
 }
 
 export interface OpenApiDocument {
-    [key: string]: any;
+    [key: string]: unknown;
 
     openapi: string;
     info: InfoObject;

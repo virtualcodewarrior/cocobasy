@@ -43,7 +43,7 @@ const retrieveRef = (ref: string, openApiDocument: OpenApiDocument) => {
         console.log(`we only support local references, so reference ${ref} cannot be handled. No schema validation will be done for this schema`);
     } else {
         const parts = ref.split("/").slice(1);
-        const def = parts.reduce((previous, part) => previous[part] || {}, openApiDocument);
+        const def = parts.reduce((previous, part) => (previous[part] ?? {}) as OpenApiDocument, openApiDocument);
         if (!def) {
             console.log(`we could not find ${ref}. No schema validation will be done for this reference`);
         } else {
@@ -312,7 +312,7 @@ const createValidateObject = (required: boolean | undefined, dataLocation: DATA_
         required,
         name,
         validate(request: MiddleWareRequest) {
-            const dataObject = undefined; //await request[dataLocation];
+            const dataObject = request[dataLocation];
             let errors: ErrorObject[] = [];
             if ((dataObject && dataObject[this.name] !== undefined) || !this.required) {
                 if (dataObject && dataObject[this.name] !== undefined) {
