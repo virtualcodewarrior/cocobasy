@@ -40,9 +40,9 @@ export interface MiddleWareRequest {
     method: ROUTER_VERB;
     body?: string;
     params?: Record<string, string>;
-    headers?: Headers;
+    headers?: Record<string, string>;
     cookies?: Record<string, string>;
-    query?: string;
+    query?: Record<string, string>;
 }
 
 export type MiddlewareFunction = (req: MiddleWareRequest, res: MiddleWareResponse) => Promise<void> | void;

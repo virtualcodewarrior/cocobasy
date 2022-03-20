@@ -52,13 +52,21 @@ export class MiddleWare {
         let response;
         if (verb) {
             const urlObj = new URL(req.url);
+            const headers = Array.from(req.headers.entries()).reduce((prev, [key, value]) => {
+                prev[key] = value;
+                return prev
+            }, {} as Record<string, string>);
+            const query = Array.from(urlObj.searchParams.entries()).reduce((prev, [key, value]) => {
+                prev[key] = value;
+                return prev
+            }, {} as Record<string, string>);
             const middleWareRequest: MiddleWareRequest = {
                 originalRequest: req,
                 url: req.url,
                 urlObj,
                 method: verb,
-                query: urlObj.search,
-                headers: req.headers,
+                query,
+                headers,
                 cookies: getCookies(req.headers),
             };
             try {
