@@ -1,0 +1,22 @@
+{
+	"name": "cocobasy",
+	"version": "1.0.0",
+	"description": "code configured backend system",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/virtualcodewarrior/cocobasy.git"
+	},
+	"author": "rodney draaisma",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/virtualcodewarrior/cocobasy/issues"
+	},
+	"homepage": "https://github.com/virtualcodewarrior/cocobasy#readme",
+	"dependencies": {
+		"web-component-base-class": "^1.1.0"
+	}
+}
