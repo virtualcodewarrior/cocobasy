@@ -1,6 +1,6 @@
+import {resolve} from '../deps.ts';
 import {MiddleWare, MiddlewareError} from '../middle-ware/middle-ware.ts';
 import {MiddleWareRequest, MiddleWareResponse} from '../middle-ware/types.ts';
-import {resolve} from 'https://deno.land/std@0.132.0/path/mod.ts';
 
 type MimeType = 'text/html'
 	| 'text/javascript'
